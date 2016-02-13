@@ -6,7 +6,7 @@ class MyAttrAccessorClass
 			end
 
 			define_method("#{name}") do
-			 	instance_variable_get"@#{name}"
+			 	instance_variable_get("@#{name}")
 			end
 		end
 	end
@@ -64,8 +64,8 @@ class SQLObject
 				attributes[attribute] = new_value
 			end
 
-			define_method("#{name}") do
-			 	instance_variable_get"@#{name}"
+			define_method(attribute) do
+			 	attributes[attribute]
 			end
 		end
 	end
