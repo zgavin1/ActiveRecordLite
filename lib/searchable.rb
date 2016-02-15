@@ -1,3 +1,5 @@
+require_relative 'ar_lite_1'
+require 'db_connection'
 # This file will be a model to emulate 
 # ActiveRecord's searchable module
 
@@ -26,7 +28,7 @@ module Searchable
 end
 
 
-# And we actually grant SQLObject class this capability
+# And we want to actually grant SQLObject class this capability
 class SQLObject
 	extend Searchable
 end
