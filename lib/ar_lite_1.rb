@@ -1,7 +1,11 @@
-class MyAttrAccessorClass
-	def my_attr_accessor(*names)
+require_relative 'db_connection'
+require 'active_support/inflector'
+require 'byebug'
+
+class AttrAccessorClass
+	def self.my_attr_accessor(*names)
 		names.each do |name|
-			define_method("#{name}=()") do |new_value|
+			define_method("#{name}=") do |new_value|
 				instance_variable_set("@#{name}", new_value)
 			end
 
@@ -19,11 +23,11 @@ class SQLObject
 # and reference the table associated with this object
 
 	def self.table_name
-		@table_name ||= self.name.tableize
+		@table_name ||= self.name.underscore.pluralize
 	end
 
 	def self.table_name=(name)
-		@table_name = self.name.to_s.tableize
+		@table_name = name
 	end
 
 # Next it is necessary to read the columns of the table
@@ -45,7 +49,8 @@ class SQLObject
 # Here, the result of #execute2 has been stored,
 # and we know that the first result of the return
 # is a subarray of the column names, which we 'symbolize'
-		@results.first.map { |col_name|  col_name.to_sym }
+		@results.first.map! { |col_name|  col_name.to_sym }
+
 	end
 
 # The first instance method we want define now is #attributes,
@@ -63,28 +68,29 @@ class SQLObject
 		# existing column and use define_method like we did in
 		# my_attr_accessor, except set/refer to the attrbutes 
 		# hash rather than instance variables
-		columns.each do |attribute|
-			define_method("#{attribute}=()") do |new_value|
-				attributes[attribute] = new_value
+		self.columns.each do |attribute|
+			define_method("#{attribute}=") do |new_value|
+				self.attributes[attribute] = new_value
 			end
 
 			define_method(attribute) do
-			 	attributes[attribute]
+			 	self.attributes[attribute]
 			end
 		end
 	end
 
 # Now when we call #new on our class, this
 
-	def self.initialize(params = {})
-		params.keys.each do |key|
-			if self.class.columns.includes?(key.to_sym)
+	def initialize(params = {})
+		params.each do |key, value|
+			key = key.to_sym
+			if self.class.columns.include?(key)
 				# We use .send to pass our argument to the setter
 				# method if the class' columns include that attribute
-				self.send("#{key}=", params[key])
+				self.send("#{key}=", value)
 			else
+				raise "unknown attribute '#{key}'"
 				# otherwise, raise the standard AR error.
-				raise "Unknown attribute '#{key}'."
 			end
 		end
 	end
@@ -93,7 +99,7 @@ class SQLObject
 	# ActiveRed methods starting with :all
 
 	def self.all
-		all = SQL.execute(<<-SQL)
+		all = DBConnection.execute(<<-SQL)
 			SELECT
 				#{table_name}.*
 			FROM
@@ -121,16 +127,15 @@ class SQLObject
 	def self.find(id)
 		# Using our ::all method would be inefficient, so
 		# we write a query to return the single element
-		result = SQL.execute(<<-SQL, id)
+		result = DBConnection.execute(<<-SQL)
 			SELECT
 				#{table_name}.*
 			FROM
 				#{table_name}
 			WHERE
-				#{table_name} = ?			
+				#{id} = #{table_name}.id			
 		SQL
-
-		self.new(result)
+		result.length >= 1 ? self.new(result.first) : nil
 	end
 
 	# We also need a method to augment our table
@@ -161,7 +166,7 @@ class SQLObject
 		# because #attribute values comes from the ::columns,
 		# which includes the id attribute.
 
-		SQL.execute(<<-SQL, *attribute_values[1..-1])
+		DBConnection.execute(<<-SQL, *attribute_values[1..-1])
 			INSERT INTO
 				#{self.class.table_name} (#{col_names})
 			VALUES
@@ -179,16 +184,15 @@ class SQLObject
 # different syntax for the heredoc.
 
 	def update
-		cols = self.class.columns.drop(1)
+		cols = self.class.columns
 		set_line = cols.map {|col| "#{col} = ?"}.join(", ")
-
-		SQL.execute(<<-SQL, *attribute_values[1..-1], id)
+		DBConnection.execute(<<-SQL, *attribute_values, id)
 			UPDATE
 			  #{self.class.table_name}
 			SET
 			  #{set_line}
 			WHERE
-			  #{self.class.table_name.id} = ?
+			  #{self.class.table_name}.id = ?
 		SQL
 	end
 
