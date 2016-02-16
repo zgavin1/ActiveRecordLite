@@ -39,9 +39,6 @@ module Associatable
 
 			source_options = through_options.model_class.assoc_options[source_name]
 
-			# table = source_options.model_class.table_name
-
-
 			results = DBConnection.execute(<<-SQL, key_val)
 				SELECT
 					#{source_options.table_name}.*
