@@ -1,3 +1,5 @@
+require_relative 'assoc_options'
+
 class BelongsToOptions < AssocOptions
 	def initialize(name, options = {})
 		defaults = {
