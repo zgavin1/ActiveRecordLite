@@ -1,6 +1,8 @@
 require_relative 'db_connection'
 require_relative 'searchable'
 require_relative 'has_many_options'
+require_relative 'belongs_to_options'
+require_relative 'assoc_options'
 
 # We want a module to mixin with SQLObject that contains
 # the esential association logic
@@ -57,43 +59,6 @@ module Associatable
 	end
 end
 
-# To write the above Associatable module, we need some classes
-# to store the pieces of the association relationship:
-# foreign key, primary key, and class name.
-
-# We'll first write another module,
-# AssocOptions to store this info.
-
-class AssocOptions
-	attr_accessor :foreign_key, :primary_key, :class_name
-
-	def model_class
-		@class_name.constantize
-	end
-
-	def table_name
-		model_class.table_name
-	end
-end
-
-# now we write to classes which extend this module
-# and hold set up default values
-
-class BelongsToOptions < AssocOptions
-
-	def initialize(name, options = {})
-		defaults = {
-			:primary_key => :id,
-			:foreign_key => (name.to_s + "_id").to_sym,
-			:class_name => name.to_s.camelcase
-		}
-
-		defaults.keys.each do |key|
-			self.send("#{key}=", options[key] || defaults[key])
-		end
-	end
-
-end
 
 class SQLObject
 	extend Associatable
