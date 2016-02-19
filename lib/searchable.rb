@@ -4,14 +4,14 @@ require 'db_connection'
 # ActiveRecord's searchable module
 
 module Searchable
-	# This where method takes a hash argument
-	# of values by column to match with records
-	# in our db
-	def where(params)
-		# We map the params to the correct heredoc syntax
-		where_line = params
-			.map { |key, value| "#{key} = ?" }
-    	.join(" AND ")
+  # This where method takes a hash argument
+  # of values by column to match with records
+  # in our db
+  def where(params)
+    # We map the params to the correct heredoc syntax
+    where_line = params
+      .map { |key, value| "#{key} = ?" }
+      .join(" AND ")
 
     # we store the results to be parsed
     results = DBConnection.execute(<<-SQL, *params.values)
@@ -24,11 +24,11 @@ module Searchable
     SQL
 
     parse_all(results)
-	end
+  end
 end
 
 
 # And we want to actually grant SQLObject class this capability
 class SQLObject
-	extend Searchable
+  extend Searchable
 end
