@@ -2,7 +2,7 @@
 
 ARL is a code intensive program built to facilitate a cohesive and easy to use back-end architecture with Ruby and SQL. The classes within build on one another to ultimately create a way to build a SQL table with the functionality outlined below whenever a class in Ruby is instantiated as a subclass of SQLObject.
 
-As of now, I have borrowed code for the database connection, and for my specs. As soon as possible, these files will be updated with my own code.
+As of now, I have borrowed code for the database connection and for my specs. These files will be updated with my own code asap.
 
 
 ### SQLObject
