@@ -4,10 +4,6 @@ require 'byebug'
 
 
 class SQLObject
-
-# The very first thing we need is a way to set 
-# and reference the table associated with this object
-
   def self.table_name
     @table_name ||= self.name.underscore.pluralize
   end
