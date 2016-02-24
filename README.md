@@ -32,7 +32,7 @@ These instance methods create the structure for pushing more rows into our table
 
 
 ### Searchable Module
-This module contains just one powerful method providing the cabability to query our table for rows with a specifity attribute val.
+This module contains just one powerful method providing the capability to query our table for rows with a specific attribute val.
 
 #### Searchable#where
 This method writes a SQL query with a heredoc to return specific rows matching the provided parameters. We parse our SQL returns with the class method defined in SQLObject such that it returns objects of the desired Class, rather than just raw SQL objects.
