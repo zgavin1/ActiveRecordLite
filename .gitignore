@@ -2,5 +2,6 @@
 /spec/sql_object_spec.rb
 
 /posts.sql
+/posts.db
 
 /lib/db_conn.rb
