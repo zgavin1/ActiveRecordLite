@@ -1,4 +1,4 @@
-require_relative 'db_connection'
+require_relative 'db_conn'
 require_relative 'searchable'
 require_relative 'has_many_options'
 require_relative 'belongs_to_options'

@@ -1,4 +1,4 @@
-require_relative 'db_connection'
+require_relative 'db_conn'
 require 'active_support/inflector'
 require 'byebug'
 

@@ -1,4 +1,4 @@
-require 'ar_lite_1'
+require 'attr_acessor'
 
 describe AttrAccessorClass do
   before(:all) do

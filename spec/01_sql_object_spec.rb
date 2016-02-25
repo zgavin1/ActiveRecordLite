@@ -1,5 +1,5 @@
-require 'ar_lite_1'
-require 'db_connection'
+require 'sql_object'
+require 'db_conn'
 require 'securerandom'
 
 describe SQLObject do
