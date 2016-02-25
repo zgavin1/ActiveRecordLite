@@ -1,5 +1,5 @@
 require 'sql_object'
-require 'db_conn'
+require 'db_connection'
 require 'securerandom'
 
 describe SQLObject do

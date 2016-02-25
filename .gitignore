@@ -1,1 +1,6 @@
 /.byebug_history
+/spec/sql_object_spec.rb
+
+/posts.sql
+
+/lib/db_conn.rb
