@@ -1,4 +1,4 @@
-require 'attr_acessor'
+require 'attr_accessor'
 
 describe AttrAccessorClass do
   before(:all) do

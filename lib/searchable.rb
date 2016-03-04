@@ -1,5 +1,5 @@
-require_relative 'ar_lite_1'
-require 'db_conn'
+require_relative 'sql_object'
+require 'db_connection'
 # This file will be a model to emulate 
 # ActiveRecord's searchable module
 

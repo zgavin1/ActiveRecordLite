@@ -3,75 +3,75 @@ require 'associatable'
 describe 'AssocOptions' do
   describe 'BelongsToOptions' do
     it 'provides defaults' do
-      options = BelongsToOptions.new('house')
+      options = BelongsToOptions.new('klass')
 
-      expect(options.foreign_key).to eq(:house_id)
-      expect(options.class_name).to eq('House')
+      expect(options.foreign_key).to eq(:klass_id)
+      expect(options.class_name).to eq('Klass')
       expect(options.primary_key).to eq(:id)
     end
 
     it 'allows overrides' do
-      options = BelongsToOptions.new('owner',
-                                     foreign_key: :human_id,
-                                     class_name: 'Human',
-                                     primary_key: :human_id
+      options = BelongsToOptions.new('student',
+                                     foreign_key: :student_id,
+                                     class_name: 'Student',
+                                     primary_key: :student_id
       )
 
-      expect(options.foreign_key).to eq(:human_id)
-      expect(options.class_name).to eq('Human')
-      expect(options.primary_key).to eq(:human_id)
+      expect(options.foreign_key).to eq(:student_id)
+      expect(options.class_name).to eq('Student')
+      expect(options.primary_key).to eq(:student_id)
     end
   end
 
   describe 'HasManyOptions' do
     it 'provides defaults' do
-      options = HasManyOptions.new('cats', 'Human')
+      options = HasManyOptions.new('projects', 'Student')
 
-      expect(options.foreign_key).to eq(:human_id)
-      expect(options.class_name).to eq('Cat')
+      expect(options.foreign_key).to eq(:student_id)
+      expect(options.class_name).to eq('Project')
       expect(options.primary_key).to eq(:id)
     end
 
     it 'allows overrides' do
-      options = HasManyOptions.new('cats', 'Human',
-                                   foreign_key: :owner_id,
-                                   class_name: 'Kitten',
-                                   primary_key: :human_id
+      options = HasManyOptions.new('projects', 'Student',
+                                   foreign_key: :student_id,
+                                   class_name: 'FinalProject',
+                                   primary_key: :student_id
       )
 
-      expect(options.foreign_key).to eq(:owner_id)
-      expect(options.class_name).to eq('Kitten')
-      expect(options.primary_key).to eq(:human_id)
+      expect(options.foreign_key).to eq(:student_id)
+      expect(options.class_name).to eq('FinalProject')
+      expect(options.primary_key).to eq(:student_id)
     end
   end
 
   describe 'AssocOptions' do
     before(:all) do
-      class Cat < SQLObject
+      class Project < SQLObject
         self.finalize!
       end
 
-      class Human < SQLObject
-        self.table_name = 'humans'
+      class Student < SQLObject
+        # self.table_name = 'students'
 
         self.finalize!
       end
     end
 
     it '#model_class returns class of associated object' do
-      options = BelongsToOptions.new('human')
-      expect(options.model_class).to eq(Human)
+      options = BelongsToOptions.new('student')
+      expect(options.model_class).to eq(Student)
 
-      options = HasManyOptions.new('cats', 'Human')
-      expect(options.model_class).to eq(Cat)
+      options = HasManyOptions.new('projects', 'Student')
+      expect(options.model_class).to eq(Project)
     end
     
     it '#table_name returns table name of associated object' do
-      options = BelongsToOptions.new('human')
-      expect(options.table_name).to eq('humans')
+      options = BelongsToOptions.new('student')
+      expect(options.table_name).to eq('students')
 
-      options = HasManyOptions.new('cats', 'Human')
-      expect(options.table_name).to eq('cats')
+      options = HasManyOptions.new('projects', 'Student')
+      expect(options.table_name).to eq('projects')
     end
   end
 end
@@ -81,85 +81,85 @@ describe 'Associatable' do
   after(:each) { DBConnection.reset }
 
   before(:all) do
-    class Cat < SQLObject
-      belongs_to :human, foreign_key: :owner_id
+    class Project < SQLObject
+      belongs_to :student, foreign_key: :student_id
 
       finalize!
     end
 
-    class Human < SQLObject
-      self.table_name = 'humans'
+    class Student < SQLObject
+      # self.table_name = 'students'
 
-      has_many :cats, foreign_key: :owner_id
-      belongs_to :house
+      has_many :projects, foreign_key: :student_id
+      belongs_to :klass
 
       finalize!
     end
 
-    class House < SQLObject
-      has_many :humans
+    class Klass < SQLObject
+      has_many :students
 
       finalize!
     end
   end
 
   describe '#belongs_to' do
-    let(:breakfast) { Cat.find(1) }
-    let(:devon) { Human.find(1) }
+    let(:midterm) { Project.find(1) }
+    let(:casey) { Student.find(1) }
 
-    it 'fetches `human` from `Cat` correctly' do
-      expect(breakfast).to respond_to(:human)
-      human = breakfast.human
+    it 'fetches `student` from `Project` correctly' do
+      expect(midterm).to respond_to(:student)
+      student = midterm.student
 
-      expect(human).to be_instance_of(Human)
-      expect(human.fname).to eq('Devon')
+      expect(student).to be_instance_of(Student)
+      expect(student.fname).to eq('Casey')
     end
 
-    it 'fetches `house` from `Human` correctly' do
-      expect(devon).to respond_to(:house)
-      house = devon.house
+    it 'fetches `klass` from `Student` correctly' do
+      expect(casey).to respond_to(:klass)
+      klass = casey.klass
 
-      expect(house).to be_instance_of(House)
-      expect(house.address).to eq('26th and Guerrero')
+      expect(klass).to be_instance_of(Klass)
+      expect(klass.name).to eq('Biology')
     end
 
     it 'returns nil if no associated object' do
-      stray_cat = Cat.find(5)
-      expect(stray_cat.human).to eq(nil)
+      untaken_project = Project.find(5)
+      expect(untaken_project.student).to eq(nil)
     end
   end
 
   describe '#has_many' do
-    let(:ned) { Human.find(3) }
-    let(:ned_house) { House.find(2) }
+    let(:chris) { Student.find(3) }
+    let(:chris_klass) { Klass.find(2) }
 
-    it 'fetches `cats` from `Human`' do
-      expect(ned).to respond_to(:cats)
-      cats = ned.cats
+    it 'fetches `projects` from `Student`' do
+      expect(chris).to respond_to(:projects)
+      projects = chris.projects
 
-      expect(cats.length).to eq(2)
+      expect(projects.length).to eq(2)
 
-      expected_cat_names = %w(Haskell Markov)
+      expected_project_names = %w(MathHomework MathBonus)
       2.times do |i|
-        cat = cats[i]
+        project = projects[i]
 
-        expect(cat).to be_instance_of(Cat)
-        expect(cat.name).to eq(expected_cat_names[i])
+        expect(project).to be_instance_of(Project)
+        expect(project.name).to eq(expected_project_names[i])
       end
     end
 
-    it 'fetches `humans` from `House`' do
-      expect(ned_house).to respond_to(:humans)
-      humans = ned_house.humans
+    it 'fetches `student` from `Klass`' do
+      expect(chris_klass).to respond_to(:students)
+      students = chris_klass.students
 
-      expect(humans.length).to eq(1)
-      expect(humans[0]).to be_instance_of(Human)
-      expect(humans[0].fname).to eq('Ned')
+      expect(students.length).to eq(1)
+      expect(students[0]).to be_instance_of(Student)
+      expect(students[0].fname).to eq('Chris')
     end
 
     it 'returns an empty array if no associated items' do
-      catless_human = Human.find(4)
-      expect(catless_human.cats).to eq([])
+      unenrolled_student = Student.find(4)
+      expect(unenrolled_student.projects).to eq([])
     end
   end
 
@@ -172,44 +172,44 @@ describe 'Associatable' do
     end
 
     it 'stores `belongs_to` options' do
-      cat_assoc_options = Cat.assoc_options
-      human_options = cat_assoc_options[:human]
+      project_assoc_options = Project.assoc_options
+      student_options = project_assoc_options[:student]
 
-      expect(human_options).to be_instance_of(BelongsToOptions)
-      expect(human_options.foreign_key).to eq(:owner_id)
-      expect(human_options.class_name).to eq('Human')
-      expect(human_options.primary_key).to eq(:id)
+      expect(student_options).to be_instance_of(BelongsToOptions)
+      expect(student_options.foreign_key).to eq(:student_id)
+      expect(student_options.class_name).to eq('Student')
+      expect(student_options.primary_key).to eq(:id)
     end
 
     it 'stores options separately for each class' do
-      expect(Cat.assoc_options).to have_key(:human)
-      expect(Human.assoc_options).to_not have_key(:human)
+      expect(Project.assoc_options).to have_key(:student)
+      expect(Student.assoc_options).to_not have_key(:student)
 
-      expect(Human.assoc_options).to have_key(:house)
-      expect(Cat.assoc_options).to_not have_key(:house)
+      expect(Student.assoc_options).to have_key(:klass)
+      expect(Project.assoc_options).to_not have_key(:klass)
     end
   end
 
   describe '#has_one_through' do
     before(:all) do
-      class Cat
-        has_one_through :home, :human, :house
+      class Project
+        has_one_through :klass, :student, :klass
 
         self.finalize!
       end
     end
 
-    let(:cat) { Cat.find(1) }
+    let(:project) { Project.find(1) }
 
     it 'adds getter method' do
-      expect(cat).to respond_to(:home)
+      expect(project).to respond_to(:klass)
     end
 
-    it 'fetches associated `home` for a `Cat`' do
-      house = cat.home
+    it 'fetches associated `klass` for a `Project`' do
+      klass = project.klass
 
-      expect(house).to be_instance_of(House)
-      expect(house.address).to eq('26th and Guerrero')
+      expect(klass).to be_instance_of(Klass)
+      expect(klass.name).to eq('Biology')
     end
   end
 end

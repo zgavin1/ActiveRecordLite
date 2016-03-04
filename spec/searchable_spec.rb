@@ -5,40 +5,40 @@ describe 'Searchable' do
   after(:each) { DBConnection.reset }
 
   before(:all) do
-    class Cat < SQLObject
+    class Project < SQLObject
       finalize!
     end
 
-    class Human < SQLObject
-      self.table_name = 'humans'
+    class Student < SQLObject
+      self.table_name = 'students'
 
       finalize!
     end
   end
 
   it '#where searches with single criterion' do
-    cats = Cat.where(name: 'Breakfast')
-    cat = cats.first
+    projects = Project.where(name: 'Bio Final')
+    project = projects.first
 
-    expect(cats.length).to eq(1)
-    expect(cat.name).to eq('Breakfast')
+    expect(projects.length).to eq(1)
+    expect(project.name).to eq('Bio Final')
   end
 
   it '#where can return multiple objects' do
-    humans = Human.where(house_id: 1)
-    expect(humans.length).to eq(2)
+    students = Student.where(class_id: 1)
+    expect(students.length).to eq(2)
   end
 
   it '#where searches with multiple criteria' do
-    humans = Human.where(fname: 'Matt', house_id: 1)
-    expect(humans.length).to eq(1)
+    students = Student.where(fname: 'Casey', class_id: 1)
+    expect(students.length).to eq(1)
 
-    human = humans[0]
-    expect(human.fname).to eq('Matt')
-    expect(human.house_id).to eq(1)
+    students = students[0]
+    expect(students.fname).to eq('Casey')
+    expect(students.class_id).to eq(1)
   end
 
   it '#where returns [] if nothing matches the criteria' do
-    expect(Human.where(fname: 'Nowhere', lname: 'Man')).to eq([])
+    expect(Student.where(fname: 'Nowhere', lname: 'Man')).to eq([])
   end
 end
