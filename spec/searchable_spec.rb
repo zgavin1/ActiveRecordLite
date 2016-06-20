@@ -25,17 +25,17 @@ describe 'Searchable' do
   end
 
   it '#where can return multiple objects' do
-    students = Student.where(class_id: 1)
+    students = Student.where(klass_id: 1)
     expect(students.length).to eq(2)
   end
 
   it '#where searches with multiple criteria' do
-    students = Student.where(fname: 'Casey', class_id: 1)
+    students = Student.where(fname: 'Casey', klass_id: 1)
     expect(students.length).to eq(1)
 
     students = students[0]
     expect(students.fname).to eq('Casey')
-    expect(students.class_id).to eq(1)
+    expect(students.klass_id).to eq(1)
   end
 
   it '#where returns [] if nothing matches the criteria' do
